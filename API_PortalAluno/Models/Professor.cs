@@ -10,7 +10,7 @@ namespace API_PortalAluno.Models
         public required string Senha { get; set; }
 
         public int EnderecoId { get; set; }
-        public required Endereco Endereco { get; set; }
+        public Endereco? Endereco { get; set; }
         public ICollection<Materia> Materias { get; } = new List<Materia>();
         public List<Turma> Turmas { get; } = [];
     }

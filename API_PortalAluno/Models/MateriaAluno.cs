@@ -3,9 +3,9 @@
     public class MateriaAluno
     {
         public int MateriaId { get; set; }
-        public required Materia Materia { get; set; }
+        public Materia? Materia { get; set; }
         public int AlunoId { get; set; }
-        public required Aluno Aluno { get; set; }
+        public Aluno? Aluno { get; set; }
 
         public double Nota1 { get; set; }
         public double Nota2 { get; set; }

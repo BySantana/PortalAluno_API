@@ -16,7 +16,6 @@ namespace API_PortalAluno.Context
         public DbSet<Materia> Materia => Set<Materia>();
         public DbSet<Professor> Professores => Set<Professor>();
         public DbSet<Turma> Turmas => Set<Turma>();
-        //public DbSet<ControleAluno> ControleAlunos => Set<ControleAluno>();
         public DbSet<MateriaAluno> MateriaAlunos => Set<MateriaAluno>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
