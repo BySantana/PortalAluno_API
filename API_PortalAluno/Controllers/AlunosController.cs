@@ -42,8 +42,6 @@ namespace API_PortalAluno.Controllers
             return aluno;
         }
 
-        // PUT: api/Alunos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAluno(int id, Aluno aluno)
         {
@@ -73,18 +71,25 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
-        // POST: api/Alunos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Aluno>> PostAluno(Aluno aluno)
         {
+
             _context.Alunos.Add(aluno);
             await _context.SaveChangesAsync();
+
+            try
+            {
+                await InsereMaterias(aluno.TurmaId);
+            } catch (Exception ex)
+            {
+                ex.ToString();
+            }
 
             return CreatedAtAction("GetAluno", new { id = aluno.Id }, aluno);
         }
 
-        // DELETE: api/Alunos/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteAluno(int id)
         {
@@ -103,6 +108,41 @@ namespace API_PortalAluno.Controllers
         private bool AlunoExists(int id)
         {
             return _context.Alunos.Any(e => e.Id == id);
+        }
+
+        private async Task<int> LastAlunoCreated()
+        {
+            return await _context.Alunos
+                .OrderByDescending(aluno => aluno.Id)
+                .Select(aluno => aluno.Id)
+                .FirstOrDefaultAsync();
+        }
+
+        private async Task<bool> InsereMaterias(int turmaId)
+        {
+            var turma = await _context.Turmas.FindAsync(turmaId);
+
+            if (turma != null)
+            {
+                var materias = await _context.Materia.Where(x => x.TurmaId == turma.Id).ToListAsync();
+
+                foreach (var a in materias)
+                {
+                    _context.MateriaAlunos.Add(new MateriaAluno
+                    {
+                        AlunoId = await LastAlunoCreated(),
+                        MateriaId = a.Id,
+                        Status = "Cursando"
+                    });
+                    await _context.SaveChangesAsync();
+                }
+
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

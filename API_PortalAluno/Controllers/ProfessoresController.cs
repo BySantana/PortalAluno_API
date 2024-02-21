@@ -26,7 +26,9 @@ namespace API_PortalAluno.Controllers
         public async Task<ActionResult<IEnumerable<Professor>>> GetProfessores()
         {
             return await _context.Professores
-                .Include(a => a.Endereco)
+                //.Include(a => a.Endereco)
+                //.Include(a => a.Turmas)
+                //.Include(a => a.Materias)
                 .ToListAsync();
         }
 

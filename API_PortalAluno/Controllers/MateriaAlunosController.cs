@@ -21,18 +21,16 @@ namespace API_PortalAluno.Controllers
             _context = context;
         }
 
-        // GET: api/MateriaAlunos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<MateriaAluno>>> GetMateriaAlunos()
         {
             return await _context.MateriaAlunos.ToListAsync();
         }
 
-        // GET: api/MateriaAlunos/5
-        [HttpGet("{id}")]
-        public async Task<ActionResult<MateriaAluno>> GetMateriaAluno(int id)
+        [HttpGet("{alunoId}")]
+        public async Task<ActionResult<IEnumerable<MateriaAluno>>> GetMateriaAlunoByAluno(int alunoId)
         {
-            var materiaAluno = await _context.MateriaAlunos.FindAsync(id);
+            var materiaAluno = await _context.MateriaAlunos.Where(a => a.AlunoId == alunoId).ToListAsync();
 
             if (materiaAluno == null)
             {
@@ -42,12 +40,10 @@ namespace API_PortalAluno.Controllers
             return materiaAluno;
         }
 
-        // PUT: api/MateriaAlunos/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
-        [HttpPut("{id}")]
-        public async Task<IActionResult> PutMateriaAluno(int id, MateriaAluno materiaAluno)
+        [HttpPut("{alunoId}, {materiaId}")]
+        public async Task<IActionResult> PutMateriaAluno(int alunoId, int materiaId, MateriaAluno materiaAluno)
         {
-            if (id != materiaAluno.AlunoId)
+            if (alunoId != materiaAluno.AlunoId && materiaId != materiaAluno.MateriaId)
             {
                 return BadRequest();
             }
@@ -60,7 +56,7 @@ namespace API_PortalAluno.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!MateriaAlunoExists(id))
+                if (!MateriaAlunoExists(alunoId, materiaId))
                 {
                     return NotFound();
                 }
@@ -73,8 +69,6 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
-        // POST: api/MateriaAlunos
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<MateriaAluno>> PostMateriaAluno(MateriaAluno materiaAluno)
         {
@@ -85,7 +79,7 @@ namespace API_PortalAluno.Controllers
             }
             catch (DbUpdateException)
             {
-                if (MateriaAlunoExists(materiaAluno.AlunoId))
+                if (MateriaAlunoExists(materiaAluno.AlunoId, materiaAluno.MateriaId))
                 {
                     return Conflict();
                 }
@@ -98,11 +92,10 @@ namespace API_PortalAluno.Controllers
             return CreatedAtAction("GetMateriaAluno", new { id = materiaAluno.AlunoId }, materiaAluno);
         }
 
-        // DELETE: api/MateriaAlunos/5
-        [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteMateriaAluno(int id)
+        [HttpDelete("{alunoId}, {materiaId}")]
+        public async Task<IActionResult> DeleteMateriaAluno(int alunoId, int materiaId)
         {
-            var materiaAluno = await _context.MateriaAlunos.FindAsync(id);
+            var materiaAluno = await _context.MateriaAlunos.FindAsync(alunoId, materiaId);
             if (materiaAluno == null)
             {
                 return NotFound();
@@ -114,9 +107,9 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
-        private bool MateriaAlunoExists(int id)
+        private bool MateriaAlunoExists(int alunoId, int materiaId)
         {
-            return _context.MateriaAlunos.Any(e => e.AlunoId == id);
+            return _context.MateriaAlunos.Any(e => e.AlunoId == alunoId && e.MateriaId == materiaId );
         }
     }
 }

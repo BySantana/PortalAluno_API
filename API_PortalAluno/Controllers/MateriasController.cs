@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API_PortalAluno.Context;
 using API_PortalAluno.Models;
+using System.Drawing.Drawing2D;
 
 namespace API_PortalAluno.Controllers
 {
@@ -45,8 +46,6 @@ namespace API_PortalAluno.Controllers
             return materia;
         }
 
-        // PUT: api/Materias/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPut("{id}")]
         public async Task<IActionResult> PutMateria(int id, Materia materia)
         {
@@ -76,18 +75,31 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
-        // POST: api/Materias
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
         [HttpPost]
         public async Task<ActionResult<Materia>> PostMateria(Materia materia)
         {
             _context.Materia.Add(materia);
             await _context.SaveChangesAsync();
 
+            try
+            {
+                InsertProfessorTurma(materia.TurmaId, materia.ProfessorId);
+            }
+            catch(Exception ex)
+            {
+                ex.ToString();
+            }
+            
+
             return CreatedAtAction("GetMateria", new { id = materia.Id }, materia);
         }
 
-        // DELETE: api/Materias/5
+        private async void InsertProfessorTurma(int turmaId, int professorId)
+        {
+            _context.ProfessorTurma.Add(new ProfessorTurma { TurmaId = turmaId, ProfessorId = professorId });
+            await _context.SaveChangesAsync();
+        }
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteMateria(int id)
         {

@@ -17,6 +17,7 @@ namespace API_PortalAluno.Context
         public DbSet<Professor> Professores => Set<Professor>();
         public DbSet<Turma> Turmas => Set<Turma>();
         public DbSet<MateriaAluno> MateriaAlunos => Set<MateriaAluno>();
+        public DbSet<ProfessorTurma> ProfessorTurma => Set<ProfessorTurma>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -24,7 +25,8 @@ namespace API_PortalAluno.Context
 
             modelBuilder.Entity<Professor>()
                 .HasMany(e => e.Turmas)
-                .WithMany(e => e.Professores);
+                .WithMany(e => e.Professores)
+                .UsingEntity<ProfessorTurma>();
 
             #endregion
 

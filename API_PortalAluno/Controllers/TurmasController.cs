@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API_PortalAluno.Context;
 using API_PortalAluno.Models;
+using System.Diagnostics;
 
 namespace API_PortalAluno.Controllers
 {
@@ -25,14 +26,18 @@ namespace API_PortalAluno.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Turma>>> GetTurmas()
         {
-            return await _context.Turmas.ToListAsync();
+            return await _context.Turmas
+                .Include(t => t.Professores)
+                .Include(t => t.Materias)
+                .ToListAsync();
         }
 
         // GET: api/Turmas/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Turma>> GetTurma(int id)
         {
-            var turma = await _context.Turmas.FindAsync(id);
+            var turma = await _context.Turmas
+                .FindAsync(id);
 
             if (turma == null)
             {
