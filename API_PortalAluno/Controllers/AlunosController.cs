@@ -21,14 +21,12 @@ namespace API_PortalAluno.Controllers
             _context = context;
         }
 
-        // GET: api/Alunos
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Aluno>>> GetAlunos()
         {
             return await _context.Alunos.ToListAsync();
         }
 
-        // GET: api/Alunos/5
         [HttpGet("{id}")]
         public async Task<ActionResult<Aluno>> GetAluno(int id)
         {
@@ -71,6 +69,39 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
+        [HttpPut("{alunoId}, {novaTurmaId}")]
+        public async Task<bool> TrocarTurma(int alunoId, int novaTurmaId)
+        {
+            var materiasAlunos = await _context.MateriaAlunos.
+                AsNoTracking().
+                Where(a => a.AlunoId == alunoId).
+                ToArrayAsync();
+
+            var aluno = await _context.Alunos
+                .AsNoTracking()
+                .FirstOrDefaultAsync(a => a.Id == alunoId);
+
+            if (aluno != null)
+            {
+                aluno.TurmaId = novaTurmaId;
+                _context.Alunos.Update(aluno);
+            }
+
+            _context.MateriaAlunos.RemoveRange(materiasAlunos);
+
+            try
+            {
+                await _context.SaveChangesAsync();
+                await InsereMaterias(novaTurmaId, alunoId);
+            }
+            catch
+            {
+                throw;
+            }
+
+            return true;
+        }
+
         [HttpPost]
         public async Task<ActionResult<Aluno>> PostAluno(Aluno aluno)
         {
@@ -80,7 +111,7 @@ namespace API_PortalAluno.Controllers
 
             try
             {
-                await InsereMaterias(aluno.TurmaId);
+                await InsereMaterias(aluno.TurmaId, 0);
             } catch (Exception ex)
             {
                 ex.ToString();
@@ -107,18 +138,19 @@ namespace API_PortalAluno.Controllers
 
         private bool AlunoExists(int id)
         {
-            return _context.Alunos.Any(e => e.Id == id);
+            return _context.Alunos.AsNoTracking().Any(e => e.Id == id);
         }
 
         private async Task<int> LastAlunoCreated()
         {
             return await _context.Alunos
+                .AsNoTracking()
                 .OrderByDescending(aluno => aluno.Id)
                 .Select(aluno => aluno.Id)
                 .FirstOrDefaultAsync();
         }
 
-        private async Task<bool> InsereMaterias(int turmaId)
+        private async Task<bool> InsereMaterias(int turmaId, int alunoId)
         {
             var turma = await _context.Turmas.FindAsync(turmaId);
 
@@ -130,7 +162,7 @@ namespace API_PortalAluno.Controllers
                 {
                     _context.MateriaAlunos.Add(new MateriaAluno
                     {
-                        AlunoId = await LastAlunoCreated(),
+                        AlunoId = alunoId == 0 ? await LastAlunoCreated() : alunoId,
                         MateriaId = a.Id,
                         Status = "Cursando"
                     });
@@ -144,5 +176,7 @@ namespace API_PortalAluno.Controllers
                 return false;
             }
         }
+
+        
     }
 }
