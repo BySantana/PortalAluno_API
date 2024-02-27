@@ -1,10 +1,13 @@
 ﻿using API_PortalAluno.Models;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Hosting;
+using System.Data;
 
 namespace API_PortalAluno.Context
 {
-    public class AppDbContext : DbContext
+    public class AppDbContext : IdentityDbContext<UserAdmin>
     {
         public AppDbContext(DbContextOptions<AppDbContext> options) : base(options)
         {
@@ -18,6 +21,7 @@ namespace API_PortalAluno.Context
         public DbSet<Turma> Turmas => Set<Turma>();
         public DbSet<MateriaAluno> MateriaAlunos => Set<MateriaAluno>();
         public DbSet<ProfessorTurma> ProfessorTurma => Set<ProfessorTurma>();
+        public DbSet<UserAdmin> UsersAdmin => Set<UserAdmin>();
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -47,6 +51,8 @@ namespace API_PortalAluno.Context
                      );
 
             #endregion
+
+            base.OnModelCreating(modelBuilder);
         }
     }
 }

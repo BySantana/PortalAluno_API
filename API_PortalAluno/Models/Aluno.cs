@@ -14,7 +14,5 @@
 
         public List<Materia> Materias { get; } = [];
         public List<MateriaAluno> MateriasAlunos { get; } = [];
-
-        //public List<ControleAluno> ControleAlunos { get; } = [];
     }
 }
