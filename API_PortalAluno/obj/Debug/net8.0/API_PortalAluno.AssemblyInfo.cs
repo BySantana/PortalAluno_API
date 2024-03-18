@@ -11,10 +11,11 @@
 using System;
 using System.Reflection;
 
+[assembly: Microsoft.Extensions.Configuration.UserSecrets.UserSecretsIdAttribute("aspnet-API_PortalAluno-90F7E69D-B9B1-4440-BAD0-E4BD4D9B2B21")]
 [assembly: System.Reflection.AssemblyCompanyAttribute("API_PortalAluno")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+88534b9c0b66f7b9bced6b69bdd3a6d4f743069e")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+9bfe266180b70ed831b66754a2facb0e7a2e9a63")]
 [assembly: System.Reflection.AssemblyProductAttribute("API_PortalAluno")]
 [assembly: System.Reflection.AssemblyTitleAttribute("API_PortalAluno")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

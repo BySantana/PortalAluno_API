@@ -1,4 +1,5 @@
 ﻿using API_PortalAluno.Models;
+using API_PortalAluno.Models.User;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;

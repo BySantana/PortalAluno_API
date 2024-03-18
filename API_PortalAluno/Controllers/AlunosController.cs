@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API_PortalAluno.Context;
 using API_PortalAluno.Models;
+using API_PortalAluno.Services;
+using API_PortalAluno.Models.User;
+using Microsoft.AspNetCore.Authorization;
 
 namespace API_PortalAluno.Controllers
 {
@@ -15,13 +18,16 @@ namespace API_PortalAluno.Controllers
     public class AlunosController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly AuthService _authService;
 
-        public AlunosController(AppDbContext context)
+        public AlunosController(AppDbContext context, AuthService authService)
         {
             _context = context;
+            _authService = authService;
         }
 
         [HttpGet]
+        [Authorize]
         public async Task<ActionResult<IEnumerable<Aluno>>> GetAlunos()
         {
             return await _context.Alunos.ToListAsync();
@@ -112,9 +118,10 @@ namespace API_PortalAluno.Controllers
             try
             {
                 await InsereMaterias(aluno.TurmaId, 0);
+                await RegisterAluno();
             } catch (Exception ex)
             {
-                ex.ToString();
+
             }
 
             return CreatedAtAction("GetAluno", new { id = aluno.Id }, aluno);
@@ -177,6 +184,23 @@ namespace API_PortalAluno.Controllers
             }
         }
 
-        
+        private async Task<bool> RegisterAluno()
+        {
+            var alunoId = await LastAlunoCreated();
+            var aluno = await _context.Alunos.FindAsync(alunoId);
+
+            if(aluno != null)
+            {
+            await _authService.CreateAccountAlunoAsync(new UserLogin{ Password = aluno.Senha, UserName = aluno.Name}, alunoId);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
     }
+
+    
 }
