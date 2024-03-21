@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using API_PortalAluno.Context;
 using API_PortalAluno.Models;
+using API_PortalAluno.Models.User;
+using API_PortalAluno.Services;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 
 namespace API_PortalAluno.Controllers
 {
@@ -15,13 +18,15 @@ namespace API_PortalAluno.Controllers
     public class ProfessoresController : ControllerBase
     {
         private readonly AppDbContext _context;
+        private readonly AuthService _authService;
 
-        public ProfessoresController(AppDbContext context)
+        public ProfessoresController(AppDbContext context, AuthService authService)
         {
             _context = context;
+            _authService = authService;
         }
 
-        // GET: api/Professores
+
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Professor>>> GetProfessores()
         {
@@ -32,7 +37,7 @@ namespace API_PortalAluno.Controllers
                 .ToListAsync();
         }
 
-        // GET: api/Professores/5
+
         [HttpGet("{id}")]
         public async Task<ActionResult<Professor>> GetProfessor(int id)
         {
@@ -46,8 +51,7 @@ namespace API_PortalAluno.Controllers
             return professor;
         }
 
-        // PUT: api/Professores/5
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPut("{id}")]
         public async Task<IActionResult> PutProfessor(int id, Professor professor)
         {
@@ -77,18 +81,26 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
-        // POST: api/Professores
-        // To protect from overposting attacks, see https://go.microsoft.com/fwlink/?linkid=2123754
+
         [HttpPost]
         public async Task<ActionResult<Professor>> PostProfessor(Professor professor)
         {
             _context.Professores.Add(professor);
             await _context.SaveChangesAsync();
 
+            try
+            {
+                await RegisterProfessor();
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+
             return CreatedAtAction("GetProfessor", new { id = professor.Id }, professor);
         }
 
-        // DELETE: api/Professores/5
+
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteProfessor(int id)
         {
@@ -107,6 +119,31 @@ namespace API_PortalAluno.Controllers
         private bool ProfessorExists(int id)
         {
             return _context.Professores.Any(e => e.Id == id);
+        }
+
+        private async Task<int> LastProfessorCreated()
+        {
+            return await _context.Professores
+                .AsNoTracking()
+                .OrderByDescending(professor => professor.Id)
+                .Select(professor => professor.Id)
+                .FirstOrDefaultAsync();
+        }
+
+        private async Task<bool> RegisterProfessor()
+        {
+            var professorId = await LastProfessorCreated();
+            var professor = await _context.Professores.FindAsync(professorId);
+
+            if (professor != null)
+            {
+                await _authService.CreateAccountProfessorAsync(new UserLogin { Password = professor.Senha, UserName = professor.Nome }, professorId);
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }

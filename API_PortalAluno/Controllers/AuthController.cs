@@ -1,8 +1,10 @@
-﻿using API_PortalAluno.Models.User;
+﻿using API_PortalAluno.Models;
+using API_PortalAluno.Models.User;
 using API_PortalAluno.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using System.Security.Claims;
 
 namespace API_PortalAluno.Controllers
@@ -13,11 +15,13 @@ namespace API_PortalAluno.Controllers
     {
         private readonly UserManager<UserAdmin> _userManager;
         private readonly TokenService _tokenService;
+        private readonly AuthService _authService;
 
-        public AuthController(UserManager<UserAdmin> userManager, TokenService tokenService)
+        public AuthController(UserManager<UserAdmin> userManager, TokenService tokenService, AuthService authService)
         {
             _userManager = userManager;
             _tokenService = tokenService;
+            _authService = authService;
         }
 
         [HttpPost("login")]
@@ -33,6 +37,9 @@ namespace API_PortalAluno.Controllers
                 new Claim(ClaimTypes.Name, user.UserName),
             };
 
+                var roles = await _userManager.GetRolesAsync(user);
+                claims.AddRange(roles.Select(role => new Claim(ClaimTypes.Role, role)));
+
                 var token = _tokenService.GenerateToken(claims);
 
                 return Ok(new { Token = token });
@@ -40,5 +47,15 @@ namespace API_PortalAluno.Controllers
 
             return Unauthorized();
         }
+
+        [HttpPost("register")]
+        [AllowAnonymous]
+        public async Task<IActionResult> RegisterAdmin([FromBody] UserLogin model)
+        {
+            await _authService.CreateAccountAdminAsync(new UserLogin { Password = model.Password, UserName = model.UserName });
+
+            return Ok(new {User = model.UserName});
+        }
+
     }
 }

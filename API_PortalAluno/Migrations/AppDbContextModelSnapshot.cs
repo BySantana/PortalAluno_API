@@ -58,7 +58,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("Alunos");
+                    b.ToTable("Alunos", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.Endereco", b =>
@@ -87,7 +87,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Enderecos");
+                    b.ToTable("Enderecos", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.Materia", b =>
@@ -114,7 +114,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("Materia");
+                    b.ToTable("Materia", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.MateriaAluno", b =>
@@ -145,7 +145,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasIndex("MateriaId");
 
-                    b.ToTable("MateriaAlunos");
+                    b.ToTable("MateriaAlunos", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.Professor", b =>
@@ -175,7 +175,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasIndex("EnderecoId");
 
-                    b.ToTable("Professores");
+                    b.ToTable("Professores", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.ProfessorTurma", b =>
@@ -190,7 +190,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasIndex("TurmaId");
 
-                    b.ToTable("ProfessorTurma");
+                    b.ToTable("ProfessorTurma", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.Turma", b =>
@@ -211,7 +211,7 @@ namespace API_PortalAluno.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Turmas");
+                    b.ToTable("Turmas", (string)null);
                 });
 
             modelBuilder.Entity("API_PortalAluno.Models.User.UserAdmin", b =>

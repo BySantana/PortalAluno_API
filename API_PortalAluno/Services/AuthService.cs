@@ -42,5 +42,54 @@ namespace API_PortalAluno.Services
                 throw new Exception($"Erro ao tentar Criar Usuário. Erro: {ex.Message}");
             }
         }
+
+        public async Task<UserAdmin> CreateAccountProfessorAsync(UserLogin userLogin, int professorId)
+        {
+            try
+            {
+                var user = _mapper.Map<UserAdmin>(userLogin);
+                user.ProfessorId = professorId;
+                user.AlunoId = null;
+
+                var result = await _userManager.CreateAsync(user, userLogin.Password);
+
+                if (result.Succeeded)
+                {
+                    return user;
+                }
+
+                return null;
+
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Erro ao tentar Criar Usuário. Erro: {ex.Message}");
+            }
+        }
+
+        public async Task<UserAdmin> CreateAccountAdminAsync(UserLogin userLogin)
+        {
+            try
+            {
+                var user = _mapper.Map<UserAdmin>(userLogin);
+                user.IsAdmin = true;
+                user.ProfessorId = null;
+                user.AlunoId = null;
+
+                var result = await _userManager.CreateAsync(user, userLogin.Password);
+
+                if (result.Succeeded)
+                {
+                    return user;
+                }
+
+                return null;
+
+            }
+            catch (System.Exception ex)
+            {
+                throw new Exception($"Erro ao tentar Criar Usuário. Erro: {ex.Message}");
+            }
+        }
     }
 }

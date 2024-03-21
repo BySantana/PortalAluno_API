@@ -26,6 +26,7 @@ namespace API_PortalAluno.Controllers
             _authService = authService;
         }
 
+
         [HttpGet]
         [Authorize]
         public async Task<ActionResult<IEnumerable<Aluno>>> GetAlunos()
@@ -33,7 +34,9 @@ namespace API_PortalAluno.Controllers
             return await _context.Alunos.ToListAsync();
         }
 
+
         [HttpGet("{id}")]
+        [Authorize(Roles = "Admin")]
         public async Task<ActionResult<Aluno>> GetAluno(int id)
         {
             var aluno = await _context.Alunos.FindAsync(id);
@@ -45,6 +48,7 @@ namespace API_PortalAluno.Controllers
 
             return aluno;
         }
+
 
         [HttpPut("{id}")]
         public async Task<IActionResult> PutAluno(int id, Aluno aluno)
@@ -75,7 +79,8 @@ namespace API_PortalAluno.Controllers
             return NoContent();
         }
 
-        [HttpPut("{alunoId}, {novaTurmaId}")]
+
+        [HttpPut("TrocaTurma/{alunoId}, {novaTurmaId}")]
         public async Task<bool> TrocarTurma(int alunoId, int novaTurmaId)
         {
             var materiasAlunos = await _context.MateriaAlunos.
@@ -107,6 +112,7 @@ namespace API_PortalAluno.Controllers
 
             return true;
         }
+
 
         [HttpPost]
         public async Task<ActionResult<Aluno>> PostAluno(Aluno aluno)
@@ -142,6 +148,38 @@ namespace API_PortalAluno.Controllers
 
             return NoContent();
         }
+
+
+        [HttpPut("Notas/{alunoId}, {materiaId}")]
+        public async Task<ActionResult<MateriaAluno>> PostNotaAluno(int alunoId, int materiaId, double nota1, double nota2, double nota3)
+        {
+
+            var materiaAluno = await _context.MateriaAlunos.FindAsync(alunoId, materiaId);
+
+            if(materiaAluno == null)
+            {
+                return NotFound();
+            }
+
+            materiaAluno.Nota1 = nota1;
+            materiaAluno.Nota2 = nota2;
+            materiaAluno.Nota3 = nota3;
+
+            _context.Entry(materiaAluno).State = EntityState.Modified;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                throw;
+            }
+
+            return materiaAluno;
+        }
+
+
 
         private bool AlunoExists(int id)
         {
